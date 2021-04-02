@@ -36,7 +36,7 @@ namespace DomainLayer.DataAccess
 
         public virtual ICollection<E> Find(string index)
         {
-            return LoadCollection(dbSet).Where(e => e.Index == index).ToList();
+            return dbSet.Where(e => e.Index == index).ToList();
         }
 
         public virtual E Read(K key)
@@ -46,13 +46,13 @@ namespace DomainLayer.DataAccess
             {
                 throw new InvalidOperationException("No object to be read");
             }
-            LoadEntity(readEntity);
+            
             return readEntity;
         }
 
         public virtual ICollection<E> ReadAll()
         {
-            return LoadCollection(dbSet).ToList();
+            return dbSet.ToList();
         }
 
         public virtual void Update(E item)
@@ -68,7 +68,6 @@ namespace DomainLayer.DataAccess
         }
 
         protected abstract void MapConnections(E entity);
-        protected abstract IEnumerable<E> LoadCollection(DbSet<E> dbSet);
-        protected abstract void LoadEntity(E entity);
+        
     }
 }

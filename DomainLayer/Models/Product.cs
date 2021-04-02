@@ -22,9 +22,7 @@ namespace DomainLayer.Models
 
 
         [NotMapped]
-        public string Key => Barcode;
-        [NotMapped]
-        public bool LoadedConections { get; set; }
+        public string Key => Barcode;        
         [NotMapped]
         public string Index => Name;
 

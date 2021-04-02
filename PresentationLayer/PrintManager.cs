@@ -24,9 +24,9 @@ namespace PresentationLayer
         {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.Append($"|ID: {productVM.Barcode,-12}|Name: {productVM.Name,-20}|Quantity: {productVM.Quantity,-5}|Price: {productVM.Price,-7:C}|");
-            if (productVM.Movie != null)
+            if (productVM.Brand != null)
             {
-                stringBuilder.Append($"Brand: {productVM.Movie.Name,-20}|");
+                stringBuilder.Append($"Brand: {productVM.Brand.Name,-15}|");
             }
             if (productVM.Users !=null)
             {

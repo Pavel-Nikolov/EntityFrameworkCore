@@ -14,15 +14,7 @@ namespace DomainLayer.DataAccess
 
         }
 
-        protected override IEnumerable<Brand> LoadCollection(DbSet<Brand> dbSet)
-        {
-            return dbSet.Include(x => x.Products);
-        }
-
-        protected override void LoadEntity(Brand entity)
-        {
-            context.Entry<Brand>(entity).Collection(e => e.Products).Load();
-        }
+       
 
         protected override void MapConnections(Brand brand)
         {

@@ -9,7 +9,7 @@ namespace ServiceLayer.ViewModels
         public string Name { get; set; }
         public int Quantity { get; set; }
         public decimal Price { get; set; }
-        public BrandVM Movie { get; set; }
+        public BrandVM Brand { get; set; }
         public List<UserVM> Users { get; set; }
 
         public ProductVM(Product product, bool loadConnection = false)
@@ -22,7 +22,7 @@ namespace ServiceLayer.ViewModels
             if (loadConnection)
             {
                 product.Brand = product.Brand;
-                Movie = new BrandVM(product.Brand);
+                Brand = new BrandVM(product.Brand);
 
                 Users = new List<UserVM>();
                 foreach (var item in product.Users)

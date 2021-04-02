@@ -13,15 +13,7 @@ namespace DomainLayer.DataAccess
 
         }
 
-        protected override IEnumerable<User> LoadCollection(DbSet<User> dbSet)
-        {
-            return dbSet.Include(x => x.Products);
-        }
-
-        protected override void LoadEntity(User entity)
-        {
-            context.Entry<User>(entity).Collection(x => x.Products).Load();
-        }
+        
 
         protected override void MapConnections(User user)
         {

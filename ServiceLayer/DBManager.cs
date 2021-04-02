@@ -14,12 +14,14 @@ namespace ServiceLayer
         private static readonly BrandRepository brandRepository;
         private static readonly ProductRepository productRepository;
         private static readonly UserRepository userRepository;
+        private static readonly DBFinder finder;
 
         static DBManager()
         {
             brandRepository = new BrandRepository(context);
             productRepository = new ProductRepository(context);
             userRepository = new UserRepository(context);
+            finder = new DBFinder(context);
         }
 
         public static void RunCommand(EntityType entityType, OperationType operationType, params object[] args)
@@ -50,17 +52,9 @@ namespace ServiceLayer
                     if (args.Length > 2)
                     {
                         string[] productIdsToBeCreated = args[2] as string[];
-                        foreach (var item in productIdsToBeCreated)
-                        {
-                            productsToBeCreated.Add(context.Product.Find(item));
-                        }
+                        productsToBeCreated = finder.GetProducts(productIdsToBeCreated);
                     }
-                    User userToBeCreated = new User()
-                    {
-                        Name = args[0].ToString(),
-                        Age = ParseNullable(args[1].ToString(), "?"),
-                        Products = productsToBeCreated
-                    };
+                    User userToBeCreated = EntityFactory.GenerateUser(default(int), args[0], args[1], productsToBeCreated);
                     userRepository.Create(userToBeCreated);
                     break;
 
@@ -88,18 +82,9 @@ namespace ServiceLayer
                     if (args.Length > 3)
                     {
                         string[] productIdsToBeUpdated = args[3] as string[];
-                        foreach (var item in productIdsToBeUpdated)
-                        {
-                            productsToBeUpdated.Add(context.Product.Find(item));
-                        }
+                        productsToBeUpdated = finder.GetProducts(productIdsToBeUpdated);
                     }
-                    User userToBeUpdated = new User()
-                    {
-                        ID = int.Parse(args[0].ToString()),
-                        Name = args[1].ToString(),
-                        Age = ParseNullable(args[2].ToString(), "?"),
-                        Products = productsToBeUpdated
-                    };
+                    User userToBeUpdated = EntityFactory.GenerateUser(args[0], args[1], args[2], productsToBeUpdated);
                     userRepository.Update(userToBeUpdated);
                     break;
                 case OperationType.Find:
@@ -138,27 +123,17 @@ namespace ServiceLayer
             {
                 case OperationType.Create:
                     int brandToBeCreatedId = int.Parse(args[4].ToString());
-                    Brand brandToBeCreated = context.Brand.Find(brandToBeCreatedId);
+                    Brand brandToBeCreated = finder.GetBrand(brandToBeCreatedId);
                     List<User> usersToBeCreated = new List<User>();
 
                     if (args.Length > 5)
                     {
                         int[] userIdsToBeCreated = args[5] as int[];
-                        foreach (var item in userIdsToBeCreated) 
-                        {
-                            usersToBeCreated.Add(context.Users.Find(item));
-                        }
+                        usersToBeCreated = finder.GetUsers(userIdsToBeCreated);
                     }
 
-                    Product productToBeCreated = new Product()
-                    {
-                        Barcode = args[0].ToString(),
-                        Name = args[1].ToString(),
-                        Quantity = int.Parse(args[2].ToString()),
-                        Price = decimal.Parse(args[3].ToString()),
-                        Brand = brandToBeCreated,
-                        Users = usersToBeCreated
-                    };
+                    Product productToBeCreated = EntityFactory.GenerateProduct(args[0], args[1], args[2], args[3],
+                                                                               brandToBeCreated, usersToBeCreated);
 
                     productRepository.Create(productToBeCreated);
                     break;
@@ -184,27 +159,17 @@ namespace ServiceLayer
 
                 case OperationType.Update:
                     int brandToBeUpdatedId = int.Parse(args[4].ToString());
-                    Brand brandToBeUpdated = context.Brand.Find(brandToBeUpdatedId);
+                    Brand brandToBeUpdated = finder.GetBrand(brandToBeUpdatedId);
                     List<User> usersToBeUpdated = new List<User>();
 
                     if (args.Length > 5)
                     {
                         int[] userIdsToBeUpdated = args[5] as int[];
-                        foreach (var item in userIdsToBeUpdated)
-                        {
-                            usersToBeUpdated.Add(context.Users.Find(item));
-                        }
+                        usersToBeUpdated = finder.GetUsers(userIdsToBeUpdated);
                     }
 
-                    Product productToBeUpdated = new Product()
-                    {
-                        Barcode = args[0].ToString(),
-                        Name = args[1].ToString(),
-                        Quantity = int.Parse(args[2].ToString()),
-                        Price = decimal.Parse(args[3].ToString()),
-                        Brand = brandToBeUpdated,
-                        Users = usersToBeUpdated
-                    };
+                    Product productToBeUpdated = EntityFactory.GenerateProduct(args[0], args[1], args[2], args[3],
+                                                                               brandToBeUpdated, usersToBeUpdated);
                     productRepository.Update(productToBeUpdated);
                     break;
 
@@ -231,17 +196,10 @@ namespace ServiceLayer
                     if (args.Length > 1)
                     {
                         string[] productsIdsToBeCreated = args[1] as string[];
-                        foreach (var item in productsIdsToBeCreated)
-                        {
-                            productsToBeCreated.Add(context.Product.Find(item));
-                        }
+                        productsToBeCreated = finder.GetProducts(productsIdsToBeCreated);
                     }
 
-                    Brand brandToBeCreated = new Brand
-                    {
-                        Name = args[0].ToString(),
-                        Products = productsToBeCreated
-                    };
+                    Brand brandToBeCreated = EntityFactory.GenerateBrand(default(int), args[0], productsToBeCreated);
 
                     brandRepository.Create(brandToBeCreated);
                     break;
@@ -270,17 +228,9 @@ namespace ServiceLayer
                     if (args.Length > 2)
                     {
                         string[] productsIdsToBeUpdated = args[2] as string[];
-                        foreach (var item in productsIdsToBeUpdated)
-                        {
-                            productsToBeUpdated.Add(context.Product.Find(item));
-                        }
+                        productsToBeUpdated = finder.GetProducts(productsIdsToBeUpdated);
                     }
-                    Brand moviesToBeUpdated = new Brand()
-                    {
-                        ID = int.Parse(args[0].ToString()),
-                        Name = args[1].ToString(),
-                        Products = productsToBeUpdated,
-                    };
+                    Brand moviesToBeUpdated = EntityFactory.GenerateBrand(args[0], args[1], productsToBeUpdated);
                     brandRepository.Update(moviesToBeUpdated);
                     break;
 
@@ -296,5 +246,11 @@ namespace ServiceLayer
                     break;
             }
         }
+
+
+
+
+
+        
     }
 }

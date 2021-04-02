@@ -9,10 +9,8 @@ namespace DomainLayer.Models
     {
         
         public K Key { get;}
-        public string Index { get; }
+        public string Index { get; }       
         
-        public bool LoadedConections { get; set; }
-
         public void UpdateEntity(IEntity<K> newEntity);
 
     }

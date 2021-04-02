@@ -18,8 +18,7 @@ namespace DomainLayer.Models
 
         [NotMapped]
         public int Key => ID;
-        [NotMapped]
-        public bool LoadedConections { get; set; }
+        
         [NotMapped]
         public string Index => Name;
 

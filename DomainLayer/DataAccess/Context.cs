@@ -20,7 +20,9 @@ namespace DomainLayer.DataAccess
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
            
-            optionsBuilder.UseSqlServer(@"Server=DESKTOP-E57GMEU\SQLEXPRESS;Database=CodeFirstEFCoreDb;Trusted_Connection=True;");
+            optionsBuilder
+                .UseLazyLoadingProxies()
+                .UseSqlServer(@"Server=DESKTOP-E57GMEU\SQLEXPRESS;Database=CodeFirstEFCoreDb;Trusted_Connection=True;");
         }
     }
 }
