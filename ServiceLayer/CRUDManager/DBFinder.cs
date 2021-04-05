@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ServiceLayer
+namespace ServiceLayer.CRUDManager
 {
     internal class DBFinder : IDisposable
     {

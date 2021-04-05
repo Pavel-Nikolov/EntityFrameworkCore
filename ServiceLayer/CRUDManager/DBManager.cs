@@ -2,11 +2,13 @@
 using DomainLayer.Models;
 using ServiceLayer.Enums;
 using ServiceLayer.Events;
+using ServiceLayer.Manipulations;
+using ServiceLayer.Manipulations.PropertyGetters;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ServiceLayer
+namespace ServiceLayer.CRUDManager
 {
     public static class DBManager
     {
@@ -15,6 +17,10 @@ namespace ServiceLayer
         private static readonly ProductRepository productRepository;
         private static readonly UserRepository userRepository;
         private static readonly DBFinder finder;
+        private static BrandPropertyGetter brandPropertyGetter;
+        private static ProductPropertyGetter productPropertyGetter;
+        private static UserPropertyGetter userPropertyGetter;
+        
 
         static DBManager()
         {
@@ -24,26 +30,26 @@ namespace ServiceLayer
             finder = new DBFinder(context);
         }
 
-        public static void RunCommand(EntityType entityType, OperationType operationType, params object[] args)
+        public static void RunCommand(EntityType entityType, OperationType operationType, ManipulationContext manipulationContext ,params object[] args)
         {
             context = new Context();
             switch (entityType)
             {
                 case EntityType.Brand:
-                    ManageBrands(operationType, args);
+                    ManageBrands(operationType,manipulationContext, args);
                     break;
                 case EntityType.Product:
-                    ManageProducts(operationType, args);
+                    ManageProducts(operationType,manipulationContext, args);
                     break;
                 case EntityType.User:
-                    ManageUsers(operationType, args);
+                    ManageUsers(operationType, manipulationContext, args);
                     break;
                 default:
                     break;
             }
         }
 
-        private static void ManageUsers(OperationType operationType, object[] args)
+        private static void ManageUsers(OperationType operationType, ManipulationContext manipulationContext, object[] args)
         {
             switch (operationType)
             {
@@ -66,6 +72,17 @@ namespace ServiceLayer
 
                 case OperationType.ReadAll:
                     ICollection<User> usersRead = userRepository.ReadAll();
+                    if (manipulationContext.FiltrationContext != null)
+                    {
+                        userPropertyGetter = new UserPropertyGetter(manipulationContext.FiltrationContext.PropertyName);
+                        usersRead = Manipulate<User, int>.Filter(usersRead, userPropertyGetter, manipulationContext.FiltrationContext.Value);
+                    }
+                    if (manipulationContext.OrderingContext != null)
+                    {
+                        userPropertyGetter = new UserPropertyGetter(manipulationContext.OrderingContext.PropertyName);
+                        usersRead = Manipulate<User, int>.OrderBy(usersRead, userPropertyGetter, manipulationContext.OrderingContext.Acssending);
+                    }
+                    
                     foreach (var item in usersRead)
                     {
                         EventManager.OnUserShowing(item);
@@ -90,6 +107,17 @@ namespace ServiceLayer
                 case OperationType.Find:
                     string index = args[0].ToString();
                     ICollection<User> usersFound = userRepository.Find(index);
+                    if (manipulationContext.FiltrationContext != null)
+                    {
+                        userPropertyGetter = new UserPropertyGetter(manipulationContext.FiltrationContext.PropertyName);
+                        usersFound = Manipulate<User, int>.Filter(usersFound, userPropertyGetter, manipulationContext.FiltrationContext.Value);
+                    }
+                    if (manipulationContext.OrderingContext!=null)
+                    {
+                        userPropertyGetter = new UserPropertyGetter(manipulationContext.OrderingContext.PropertyName);
+                        usersFound = Manipulate<User, int>.OrderBy(usersFound, userPropertyGetter, manipulationContext.OrderingContext.Acssending);
+                    }
+                    
                     foreach (var item in usersFound)
                     {
                         EventManager.OnUserShowing(item);
@@ -117,7 +145,7 @@ namespace ServiceLayer
             return int.Parse(input);
         }
 
-        private static void ManageProducts(OperationType operationType, object[] args)
+        private static void ManageProducts(OperationType operationType, ManipulationContext manipulationContext, object[] args)
         {
             switch (operationType)
             {
@@ -146,6 +174,17 @@ namespace ServiceLayer
 
                 case OperationType.ReadAll:
                     ICollection<Product> readProducts = productRepository.ReadAll();
+                    if (manipulationContext.FiltrationContext != null)
+                    {
+                        productPropertyGetter = new ProductPropertyGetter(manipulationContext.FiltrationContext.PropertyName);
+                        readProducts = Manipulate<Product, string>.Filter(readProducts, productPropertyGetter, manipulationContext.FiltrationContext.Value);
+                    }
+                    if (manipulationContext.OrderingContext!=null)
+                    {
+                        productPropertyGetter = new ProductPropertyGetter(manipulationContext.OrderingContext.PropertyName);
+                        readProducts = Manipulate<Product, string>.OrderBy(readProducts, productPropertyGetter, manipulationContext.OrderingContext.Acssending);
+                    }
+                    
                     foreach (var item in readProducts)
                     {
                         EventManager.OnProductShowing(item);
@@ -176,6 +215,17 @@ namespace ServiceLayer
                 case OperationType.Find:
                     string index = args[0].ToString();
                     ICollection<Product> productsFound = productRepository.Find(index);
+                    if (manipulationContext.FiltrationContext != null)
+                    {
+                        productPropertyGetter = new ProductPropertyGetter(manipulationContext.FiltrationContext.PropertyName);
+                        productsFound = Manipulate<Product, string>.Filter(productsFound, productPropertyGetter, manipulationContext.FiltrationContext.Value);
+                    }
+                    if (manipulationContext.OrderingContext!=null)
+                    {
+                        productPropertyGetter = new ProductPropertyGetter(manipulationContext.OrderingContext.PropertyName);
+                        productsFound = Manipulate<Product, string>.OrderBy(productsFound, productPropertyGetter, manipulationContext.OrderingContext.Acssending);
+                    }
+                    
                     foreach (var item in productsFound)
                     {
                         EventManager.OnProductShowing(item);
@@ -186,7 +236,7 @@ namespace ServiceLayer
             }
         }
 
-        private static void ManageBrands(OperationType operationType, object[] args)
+        private static void ManageBrands(OperationType operationType, ManipulationContext manipulationContext, object[] args)
         {
             switch (operationType)
             {
@@ -212,6 +262,17 @@ namespace ServiceLayer
 
                 case OperationType.ReadAll:
                     ICollection<Brand> readBrands = brandRepository.ReadAll();
+                    if (manipulationContext.FiltrationContext!=null)
+                    {
+                        brandPropertyGetter = new BrandPropertyGetter(manipulationContext.FiltrationContext.PropertyName);
+                        readBrands = Manipulate<Brand, int>.Filter(readBrands, brandPropertyGetter, manipulationContext.FiltrationContext.Value);
+                    }
+                    if (manipulationContext.OrderingContext!=null)
+                    {
+                        brandPropertyGetter = new BrandPropertyGetter(manipulationContext.OrderingContext.PropertyName);
+                        readBrands = Manipulate<Brand, int>.OrderBy(readBrands, brandPropertyGetter, manipulationContext.OrderingContext.Acssending);
+                    }
+                    
                     foreach (var item in readBrands)
                     {
                         EventManager.OnBrandShowing(item);
@@ -237,6 +298,17 @@ namespace ServiceLayer
                 case OperationType.Find:
                     string index = args[0].ToString();
                     ICollection<Brand> brandsFound = brandRepository.Find(index);
+                    if (manipulationContext.FiltrationContext != null)
+                    {
+                        brandPropertyGetter = new BrandPropertyGetter(manipulationContext.FiltrationContext.PropertyName);
+                        brandsFound = Manipulate<Brand, int>.Filter(brandsFound, brandPropertyGetter, manipulationContext.FiltrationContext.Value);
+                    }
+                    if (manipulationContext.OrderingContext!=null)
+                    {
+                        brandPropertyGetter = new BrandPropertyGetter(manipulationContext.OrderingContext.PropertyName);
+                        brandsFound = Manipulate<Brand, int>.OrderBy(brandsFound, brandPropertyGetter, manipulationContext.OrderingContext.Acssending);
+                    }
+                    
                     foreach (var item in brandsFound)
                     {
                         EventManager.OnBrandShowing(item);

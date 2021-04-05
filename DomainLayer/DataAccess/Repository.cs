@@ -18,7 +18,7 @@ namespace DomainLayer.DataAccess
         }
         public virtual void Create(E item)
         {
-            MapConnections(item);
+            //MapConnections(item);
             dbSet.Add(item);
             context.SaveChanges();
         }
@@ -36,7 +36,7 @@ namespace DomainLayer.DataAccess
 
         public virtual ICollection<E> Find(string index)
         {
-            return dbSet.Where(e => e.Index == index).ToList();
+            return dbSet.AsEnumerable().Where(e => e.Index == index).ToList();
         }
 
         public virtual E Read(K key)
@@ -57,7 +57,7 @@ namespace DomainLayer.DataAccess
 
         public virtual void Update(E item)
         {
-            MapConnections(item);
+            //MapConnections(item);
             E entityToBeUpdated = dbSet.Find(item.Key);
             if (entityToBeUpdated == null)
             {
